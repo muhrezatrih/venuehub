@@ -1,0 +1,88 @@
+// Prisma Schema for VenueHub
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  // Relations
+  venues Venue[]
+
+  @@map("locations")
+}
+
+model Venue {
+  id          String   @id @default(cuid())
+  name        String
+  image       String?
+  description String?
+  price       Float
+  locationId  String   @map("location_id")
+  capacityMin Int      @map("capacity_min")
+  capacityMax Int      @map("capacity_max")
+  status      Status   @default(ACTIVE)
+  createdAt   DateTime @default(now()) @map("created_at")
+  createdBy   String?  @map("created_by")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  updatedBy   String?  @map("updated_by")
+
+  // Relations
+  location Location  @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  bookings Booking[]
+
+  @@index([locationId])
+  @@index([status])
+  @@index([price])
+  @@map("venues")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  venueId       String        @map("venue_id")
+  companyName   String        @map("company_name")
+  email         String
+  startDate     DateTime      @map("start_date")
+  endDate       DateTime      @map("end_date")
+  attendeeCount Int           @map("attendee_count")
+  status        BookingStatus @default(PENDING)
+  totalPrice    Float?        @map("total_price")
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Restrict)
+
+  @@index([venueId])
+  @@index([email])
+  @@index([startDate, endDate])
+  @@index([status])
+  @@map("bookings")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+  ARCHIVED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
