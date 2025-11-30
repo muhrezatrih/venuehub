@@ -33,12 +33,6 @@ export default function HomePage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/venues"
-                className="text-stone-600 hover:text-stone-900 text-sm font-medium transition-colors"
-              >
-                Browse Venues
-              </Link>
-              <Link
-                href="/venues"
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 Get Started
